@@ -16,7 +16,7 @@ endif()
 
 target_link_libraries(dio-lib
   ${ZLIB_LIBRARIES}
-  fmt
+  ${FMT_LIBRARIES}
   flic-lib
   laf-base
   fixmath-lib

@@ -33,7 +33,7 @@ if(NOT USE_SHARED_GIFLIB)
   add_subdirectory(giflib)
 endif()
 
-if(ENABLE_WEBP AND NOT LAF_BACKEND STREQUAL "skia")
+if(ENABLE_WEBP AND NOT LAF_BACKEND STREQUAL "skia" AND NOT USE_SHARED_WEBP)
   set(WEBP_BUILD_EXTRAS OFF CACHE BOOL "Build extras.")
   set(WEBP_BUILD_ANIM_UTILS OFF CACHE BOOL "Build animation utilities.")
   set(WEBP_BUILD_CWEBP OFF CACHE BOOL "Build the cwebp command line tool.")
@@ -115,7 +115,10 @@ if(NOT USE_SHARED_HARFBUZZ AND NOT LAF_BACKEND STREQUAL "skia")
 endif()
 
 add_subdirectory(simpleini)
-add_subdirectory(fmt)
+
+if(NOT USE_SHARED_FMT)
+  add_subdirectory(fmt)
+endif()
 
 # Add cmark without tests
 if(NOT USE_SHARED_CMARK)
@@ -128,6 +131,7 @@ endif()
 add_subdirectory(json11)
 
 # libarchive
+if(NOT USE_SHARED_LIBARCHIVE)
 set(HAVE_WCSCPY 1)
 set(HAVE_WCSLEN 1)
 
@@ -149,6 +153,7 @@ set(ENABLE_LIBB2 OFF CACHE BOOL "Enable the use of the system LIBB2 library if f
 add_subdirectory(libarchive)
 target_include_directories(archive_static INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libarchive/libarchive>)
+endif()
 
 # benchmark
 if(ENABLE_BENCHMARKS)
