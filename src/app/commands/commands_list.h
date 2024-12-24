@@ -145,6 +145,7 @@ FOR_EACH_COMMAND(SetPlaybackSpeed)
 FOR_EACH_COMMAND(SetSameInk)
 FOR_EACH_COMMAND(ShowAutoGuides)
 FOR_EACH_COMMAND(ShowBrushPreview)
+FOR_EACH_COMMAND(ShowBrushPreviewInPreview)
 FOR_EACH_COMMAND(ShowExtras)
 FOR_EACH_COMMAND(ShowGrid)
 FOR_EACH_COMMAND(ShowLayerEdges)
@@ -183,4 +184,4 @@ FOR_EACH_COMMAND(Debugger)
 FOR_EACH_COMMAND(DeveloperConsole)
 FOR_EACH_COMMAND(OpenScriptFolder)
 FOR_EACH_COMMAND(RunScript)
-#endif  // ENABLE_SCRIPTING
+#endif // ENABLE_SCRIPTING

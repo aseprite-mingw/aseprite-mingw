@@ -6,7 +6,7 @@
 // the End-User License Agreement for Aseprite.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "app/tools/active_tool.h"
@@ -21,21 +21,21 @@
 #include "app/ui/color_bar.h"
 #include "app/ui/context_bar.h"
 
-namespace app {
-namespace tools {
+namespace app { namespace tools {
 
 class ActiveToolChangeTrigger {
 public:
   ActiveToolChangeTrigger(ActiveToolManager* manager)
     : m_manager(manager)
-    , m_oldTool(manager->activeTool()) {
+    , m_oldTool(manager->activeTool())
+  {
   }
 
-  ~ActiveToolChangeTrigger() {
+  ~ActiveToolChangeTrigger()
+  {
     Tool* newTool = m_manager->activeTool();
     if (m_oldTool != newTool) {
-      m_manager->notify_observers(
-        &ActiveToolObserver::onActiveToolChange, newTool);
+      m_manager->notify_observers(&ActiveToolObserver::onActiveToolChange, newTool);
     }
   }
 
@@ -47,24 +47,28 @@ private:
 ActiveToolManager::ActiveToolManager(ToolBox* toolbox)
   : m_toolbox(toolbox)
   , m_quickTool(nullptr)
+  , m_allowQuickToolChanges(true)
   , m_rightClick(false)
   , m_rightClickTool(nullptr)
   , m_rightClickInk(nullptr)
   , m_proximityTool(nullptr)
-  , m_selectedTool(m_toolbox->getToolById(WellKnownTools::Pencil)) // "pencil" is the active tool by default
+  , m_selectedTool(m_toolbox->getToolById(WellKnownTools::Pencil)) // "pencil" is the active tool by
+                                                                   // default
 {
 }
 
 Tool* ActiveToolManager::activeTool() const
 {
-  if (m_quickTool)
-    return m_quickTool;
+  if (m_allowQuickToolChanges) {
+    if (m_quickTool)
+      return m_quickTool;
 
-  if (m_rightClickTool)
-    return m_rightClickTool;
+    if (m_rightClickTool)
+      return m_rightClickTool;
 
-  if (m_proximityTool)
-    return m_proximityTool;
+    if (m_proximityTool)
+      return m_proximityTool;
+  }
 
   // Active tool should never returns null
   ASSERT(m_selectedTool);
@@ -77,13 +81,12 @@ Ink* ActiveToolManager::activeInk() const
     return m_rightClickInk;
 
   Tool* tool = activeTool();
-  Ink* ink = tool->getInk(m_rightClick ? 1: 0);
+  Ink* ink = tool->getInk(m_rightClick ? 1 : 0);
   if (ink->isPaint() && !ink->isEffect()) {
     const tools::InkType inkType = Preferences::instance().tool(tool).ink();
     app::Color color;
     if (ColorBar* colorbar = ColorBar::instance()) {
-      color = (m_rightClick ? colorbar->getBgColor():
-                              colorbar->getFgColor());
+      color = (m_rightClick ? colorbar->getBgColor() : colorbar->getFgColor());
     }
     ink = adjustToolInkDependingOnSelectedInkType(ink, inkType, color);
   }
@@ -91,10 +94,9 @@ Ink* ActiveToolManager::activeInk() const
   return ink;
 }
 
-Ink* ActiveToolManager::adjustToolInkDependingOnSelectedInkType(
-  Ink* ink,
-  const InkType inkType,
-  const app::Color& color) const
+Ink* ActiveToolManager::adjustToolInkDependingOnSelectedInkType(Ink* ink,
+                                                                const InkType inkType,
+                                                                const app::Color& color) const
 {
   if (ink->isPaint() && !ink->isEffect()) {
     const char* id = nullptr;
@@ -107,15 +109,9 @@ Ink* ActiveToolManager::adjustToolInkDependingOnSelectedInkType(
       case tools::InkType::ALPHA_COMPOSITING:
         id = tools::WellKnownInks::PaintAlphaCompositing;
         break;
-      case tools::InkType::COPY_COLOR:
-        id = tools::WellKnownInks::PaintCopy;
-        break;
-      case tools::InkType::LOCK_ALPHA:
-        id = tools::WellKnownInks::PaintLockAlpha;
-        break;
-      case tools::InkType::SHADING:
-        id = tools::WellKnownInks::Shading;
-        break;
+      case tools::InkType::COPY_COLOR: id = tools::WellKnownInks::PaintCopy; break;
+      case tools::InkType::LOCK_ALPHA: id = tools::WellKnownInks::PaintLockAlpha; break;
+      case tools::InkType::SHADING:    id = tools::WellKnownInks::Shading; break;
     }
     if (id)
       ink = m_toolbox->getInkById(id);
@@ -234,6 +230,11 @@ void ActiveToolManager::setSelectedTool(Tool* tool)
   notify_observers(&ActiveToolObserver::onSelectedToolChange, tool);
 }
 
+void ActiveToolManager::setAllowQuickToolChanges(const bool state)
+{
+  m_allowQuickToolChanges = state;
+}
+
 // static
 bool ActiveToolManager::isToolAffectedByRightClickMode(Tool* tool)
 {
@@ -247,12 +248,8 @@ bool ActiveToolManager::isToolAffectedByRightClickMode(Tool* tool)
     }
   }
 
-  return
-    ((tool->getInk(0)->isPaint() && !shadingMode) ||
-     (tool->getInk(0)->isEffect())) &&
-    (!tool->getInk(0)->isEraser()) &&
-    (!tool->getInk(0)->isSelection());
+  return ((tool->getInk(0)->isPaint() && !shadingMode) || (tool->getInk(0)->isEffect())) &&
+         (!tool->getInk(0)->isEraser()) && (!tool->getInk(0)->isSelection());
 }
 
-} // namespace tools
-} // namespace app
+}} // namespace app::tools
