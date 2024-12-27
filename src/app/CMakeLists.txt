@@ -765,10 +765,10 @@ target_link_libraries(app-lib
   ${GIF_LIBRARIES}
   ${PNG_LIBRARIES}
   ${ZLIB_LIBRARIES}
+  ${LibArchive_LIBRARIES}
   libjpeg-turbo
   json11
-  archive_static
-  fmt
+  ${FMT_LIBRARIES}
   tinyexpr
   qoi)
 
